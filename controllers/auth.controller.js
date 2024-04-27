@@ -1,13 +1,67 @@
-class AuthController {
-   async registration(req, res) {
+const authService = require('../services/auth.service')
 
+class AuthController {
+
+   async registration(req, res) {
+      const { login, password, role } = req.body;
+      // const { fingerprint } = req;
+
+      try {
+         const { accessToken, refreshToken, accessTokenExpiration } = await authService.registration({ login, password, role });
+
+         return res.status(200).json({ accessToken, refreshToken, accessTokenExpiration })
+      } catch (e) {
+         if (e.status) {
+            return res.status(e.status).json({ "error": e.error })
+         }
+         return res.status(400).json({ "error": "Oops, something went wrong!" })
+         // TODO: ErrorCatcher with error responce to client
+      }
    }
 
    async login(req, res) {
+      const { login, password } = req.body;
 
+      try {
+         const { accessToken, refreshToken, accessTokenExpiration } = await authService.login({ login, password });
+
+         return res.status(200).json({ accessToken, refreshToken, accessTokenExpiration })
+      } catch (e) {
+         if (e.status) {
+            return res.status(e.status).json({ "error": e.error })
+         }
+         return res.status(400).json({ "error": "Упс, что-то пошло не так" })
+         // TODO: ErrorCatcher with error responce to client
+      }
    }
 
-   async getUsers(req, res) {
+   async logout(req, res) {
+      const refreshToken = req.refreshToken;
 
+      try {
+         await authService.logout(refreshToken);
+
+      } catch (e) {
+         return res.status(e.status || 500).json(e.error);
+      }
    }
+
+   async refresh(req, res) {
+      const currentRefreshToken = req.refreshToken;
+
+
+      try {
+         const { accessToken, refreshToken, accessTokenExpiration } =
+            await authService.refresh({
+               currentRefreshToken
+            })
+
+         return res.sendStatus(200).json({ accessToken, refreshToken, accessTokenExpiration });
+      } catch (e) {
+         return res.status(e.status || 500).json(e.error);
+      }
+   }
+
 }
+
+module.exports = new AuthController()
