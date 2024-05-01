@@ -3,18 +3,19 @@ const authService = require('../services/auth.service')
 class AuthController {
 
    async registration(req, res) {
-      const { login, password, role } = req.body;
+      const { login, password } = req.body;
       // const { fingerprint } = req;
 
       try {
-         const { accessToken, refreshToken, accessTokenExpiration } = await authService.registration({ login, password, role });
+         const { accessToken, refreshToken, accessTokenExpiration } = await authService.registration({ login, password });
 
          return res.status(200).json({ accessToken, refreshToken, accessTokenExpiration })
       } catch (e) {
          if (e.status) {
-            return res.status(e.status).json({ "error": e.error })
+            return res.status(e.status).json({ error: e.error })
          }
-         return res.status(400).json({ "error": "Oops, something went wrong!" })
+         console.log(e);
+         return res.status(400).json({ error: "Ошибка регистрации." })
          // TODO: ErrorCatcher with error responce to client
       }
    }
@@ -30,7 +31,7 @@ class AuthController {
          if (e.status) {
             return res.status(e.status).json({ "error": e.error })
          }
-         return res.status(400).json({ "error": "Упс, что-то пошло не так" })
+         return res.status(400).json({ "error": "Ошибка входа в аккаунт." })
          // TODO: ErrorCatcher with error responce to client
       }
    }

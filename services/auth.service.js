@@ -5,18 +5,19 @@ const refreshSessionsRepository = require('../repositories/refresh_sessions.repo
 const constants = require('../constants')
 
 class AuthService {
-   async registration({ login, password, role }) {
+   async registration({ login, password }) {
       const userData = await userRepository.getUserData(login)
 
       if (userData) {
-         throw { status: "409", error: "Пользователь с таким именем уже существует" }
+         throw { status: 409, error: "Пользователь с таким именем уже существует" }
       }
+      const USER_ROLE = "USER";
 
       const hashedPassword = bcrypt.hashSync(password, 8)
 
-      const { id } = await userRepository.createUser({ login, hashedPassword, role })
+      const { id } = await userRepository.createUser({ login, hashedPassword, role: USER_ROLE })
 
-      const payload = { id, login, role };
+      const payload = { id, login, role: USER_ROLE };
       const accessToken = await tokenService.generateAccessToken(payload);
       const refreshToken = await tokenService.generateRefreshToken(payload);
 
