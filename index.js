@@ -3,7 +3,7 @@ const fingerprint = require('express-fingerprint')
 const express = require('express');
 
 // const PORT = process.env.PORT || 8080;
-const PORT = 5000;
+const PORT = 8080;
 
 // routers
 const userRouter = require('./routes/user.route')
